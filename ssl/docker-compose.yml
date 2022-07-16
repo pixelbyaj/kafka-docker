@@ -1,0 +1,39 @@
+---
+version: '2'
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_SERVER_ID: 1
+      ZOOKEEPER_CLIENT_PORT: 22181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - 22181
+    extra_hosts:
+      - "moby:127.0.0.1"
+  kafka-ssl:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper
+    ports:
+      - 19092:9092
+      - 19093:9093
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:22181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:19092, SSL://localhost:19093,
+      KAFKA_LISTNER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT, SSL:SSL
+      KAFKA_SSL_KEYSTORE_FILENAME: kafka.broker1.keystore.jks
+      KAFKA_SSL_KEYSTORE_CREDENTIALS: broker1_keystore_creds
+      KAFKA_SSL_KEY_CREDENTIALS: broker1_sslkey_creds
+      KAFKA_SSL_TRUSTSTORE_FILENAME: kafka.broker1.truststore.jks
+      KAFKA_SSL_TRUSTSTORE_CREDENTIALS: broker1_truststore_creds
+      KAFKA_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM: " "
+      KAFKA_SSL_CLIENT_AUTH: requested
+      KAFKA_SECURITY_INTER_BROKER_PROTOCOL: SSL
+    volumes:
+      - ./secrets:/etc/kafka/secrets
+    extra_hosts:
+      - "moby:127.0.0.1"
+
+  #kafka-topics --create --bootstrap-server localhost:19093 --replication-factor 1 --partitions 1 --topic MyTopic --command-config /etc/kafka/secrets/host.consumer.ssl.config
