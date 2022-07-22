@@ -5,10 +5,10 @@ services:
     image: confluentinc/cp-zookeeper:latest
     environment:
       ZOOKEEPER_SERVER_ID: 1
-      ZOOKEEPER_CLIENT_PORT: 22181
+      ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
     ports:
-      - 22181:22181
+      - 2181:2181
     extra_hosts:
       - "moby:127.0.0.1"
   kafka-ssl:
@@ -16,25 +16,14 @@ services:
     depends_on:
       - zookeeper
     ports:
-      - 19092:9092
-      - 19093:9093
+      - 9092:9092
     environment:
       KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:22181
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_SASL_ENABLED: 'false'
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:19092, SSL://localhost:19093,
-      KAFKA_LISTNER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT, SSL:SSL
-      KAFKA_SSL_KEYSTORE_FILENAME: kafka.server.keystore.jks
-      KAFKA_SSL_KEYSTORE_CREDENTIALS: ssl.creds
-      KAFKA_SSL_KEY_CREDENTIALS: ssl.creds
-      KAFKA_SSL_TRUSTSTORE_FILENAME: kafka.server.truststore.jks
-      KAFKA_SSL_TRUSTSTORE_CREDENTIALS: ssl.creds
-      KAFKA_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM: " "
-      KAFKA_SSL_CLIENT_AUTH: required
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,
+      KAFKA_LISTNER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_SECURITY_INTER_BROKER_PROTOCOL: SSL
-    volumes:
-      - ./secrets:/etc/kafka/secrets
     extra_hosts:
       - "moby:127.0.0.1"
 
