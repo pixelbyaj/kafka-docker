@@ -25,4 +25,4 @@ create-certs.bat
 ```cmd
 docker-compose -up -d
 ```
-SSL server would be up and running
+Kafka SSL server would be up and running
