@@ -11,7 +11,7 @@ services:
       - 2181:2181
     extra_hosts:
       - "moby:127.0.0.1"
-  kafka-ssl:
+  kafka-plaintext:
     image: confluentinc/cp-kafka:latest
     depends_on:
       - zookeeper
@@ -26,7 +26,18 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     extra_hosts:
       - "moby:127.0.0.1"
-
-  #kafka-topics --create --bootstrap-server localhost:19093 --replication-factor 1 --partitions 1 --topic MyTopic --command-config /etc/kafka/secrets/client.properties
-  #kafka-console-producer --bootstrap-server localhost:19093 --topic MyTopic --producer.config /etc/kafka/secrets/client.properties
-  #kafka-console-consumer --bootstrap-server localhost:19093 --topic MyTopic --consumer.config /etc/kafka/secrets/client.properties
+  kafka-ui:
+    container_name: kafka-ui
+    image: provectuslabs/kafka-ui:latest
+    ports:
+      - 8080:8080
+    environment:
+      DYNAMIC_CONFIG_ENABLED: 'true'
+      KAFKA_CLUSTERS_0_NAME: 'local-kafka'
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: 'kafka:9092'
+      KAFKA_CLUSTERS_0_ZOOKEEPER: 'zookeeper:2181'
+    depends_on:
+      - kafka-plaintext
+  #kafka-topics --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1 --topic MyTopic
+  #kafka-console-producer --bootstrap-server localhost:9092 --topic MyTopic 
+  #kafka-console-consumer --bootstrap-server localhost:9092 --topic MyTopic
